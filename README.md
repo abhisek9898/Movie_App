@@ -1,11 +1,5 @@
 # Movie Finding App
 
-<div align="center">
-  <a href="https://www.youtube.com/watch?v=f8Z9JyB2EIE" target="_blank">
-    <img src="https://github.com/user-attachments/assets/0cb17079-9b42-4a6f-9023-d82642fff73b" alt="Project Banner">
-  </a>
-</div>
-
 ## 📌 Overview
 
 A Movie Finding App built with **Expo**, **TypeScript**, and **Tailwind CSS**, leveraging **Appwrite** for backend services. The app provides real-time movie data, a popularity algorithm, and an intuitive UI for seamless browsing.
