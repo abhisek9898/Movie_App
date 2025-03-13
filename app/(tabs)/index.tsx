@@ -34,8 +34,22 @@ const Index = () => {
     error: moviesError,
   } = useFetch(() => fetchMovies({ query: "" }));
 
+  // Ensure unique trending movies
+  const uniqueTrendingMovies =
+    trendingMovies?.filter(
+      (movie, index, self) =>
+        index === self.findIndex((m) => m.movie_id === movie.movie_id)
+    ) || [];
+
+  // Ensure unique latest movies
+  const uniqueMovies =
+    movies?.filter(
+      (movie, index, self) => index === self.findIndex((m) => m.id === movie.id)
+    ) || [];
+
   return (
     <View className="flex-1 bg-primary">
+      {/* Background Image */}
       <Image
         source={images.bg}
         className="absolute w-full z-0"
@@ -47,8 +61,10 @@ const Index = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
       >
+        {/* App Logo */}
         <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
 
+        {/* Loading & Error Handling */}
         {moviesLoading || trendingLoading ? (
           <ActivityIndicator
             size="large"
@@ -56,17 +72,19 @@ const Index = () => {
             className="mt-10 self-center"
           />
         ) : moviesError || trendingError ? (
-          <Text>Error: {moviesError?.message || trendingError?.message}</Text>
+          <Text className="text-red-500 text-center mt-5">
+            Error: {moviesError?.message || trendingError?.message}
+          </Text>
         ) : (
           <View className="flex-1 mt-5">
+            {/* Search Bar */}
             <SearchBar
-              onPress={() => {
-                router.push("/search");
-              }}
+              onPress={() => router.push("/search")}
               placeholder="Search for a movie"
             />
 
-            {trendingMovies && (
+            {/* Trending Movies */}
+            {uniqueTrendingMovies.length > 0 && (
               <View className="mt-10">
                 <Text className="text-lg text-white font-bold mb-3">
                   Trending Movies
@@ -75,39 +93,44 @@ const Index = () => {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   className="mb-4 mt-3"
-                  data={trendingMovies}
-                  contentContainerStyle={{
-                    gap: 26,
-                  }}
+                  data={uniqueTrendingMovies}
+                  contentContainerStyle={{ gap: 26 }}
                   renderItem={({ item, index }) => (
                     <TrendingCard movie={item} index={index} />
                   )}
-                  keyExtractor={(item) => item.movie_id.toString()}
-                  ItemSeparatorComponent={() => <View className="w-4" />}
+                  keyExtractor={(item, index) =>
+                    item.movie_id
+                      ? item.movie_id.toString()
+                      : `trending-${index}`
+                  }
                 />
               </View>
             )}
 
-            <>
-              <Text className="text-lg text-white font-bold mt-5 mb-3">
-                Latest Movies
-              </Text>
-
-              <FlatList
-                data={movies}
-                renderItem={({ item }) => <MovieCard {...item} />}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={3}
-                columnWrapperStyle={{
-                  justifyContent: "flex-start",
-                  gap: 20,
-                  paddingRight: 5,
-                  marginBottom: 10,
-                }}
-                className="mt-2 pb-32"
-                scrollEnabled={false}
-              />
-            </>
+            {/* Latest Movies */}
+            {uniqueMovies.length > 0 && (
+              <>
+                <Text className="text-lg text-white font-bold mt-5 mb-3">
+                  Latest Movies
+                </Text>
+                <FlatList
+                  data={uniqueMovies}
+                  renderItem={({ item }) => <MovieCard {...item} />}
+                  keyExtractor={(item, index) =>
+                    item.id ? item.id.toString() : `movie-${index}`
+                  }
+                  numColumns={3}
+                  columnWrapperStyle={{
+                    justifyContent: "flex-start",
+                    gap: 20,
+                    paddingRight: 5,
+                    marginBottom: 10,
+                  }}
+                  className="mt-2 pb-32"
+                  scrollEnabled={false}
+                />
+              </>
+            )}
           </View>
         )}
       </ScrollView>
